@@ -18,138 +18,155 @@
 
 <script type="text/javascript">
 
-function writeToOutputZone() {
-	var i = 0;
-	while (i < arguments.length) {
-		document.getElementById('outputZone').innerHTML += arguments[i];
-		i++;
+
+var canvas = document.getElementById("outputCanvas");
+var gc = canvas.getContext("2d");
+var outLog = document.getElementById("outLog");
+
+var canvas, gc, drawId, nbTrans;
+
+var scene, obj, body, rightArm, leftLeg, rightLeg, legSign, deltaZ, dragX, dragY;
+
+function mousedown(event) {
+	dragX = event.clientX;
+	dragY = event.clientY;
+}
+
+function mousemove(event) {
+  if (scene && body && rightArm && dragX && dragY) {
+	var deltaX = (event.clientX - dragX) * 2 * Math.PI / canvas.width;
+	var deltaY = (dragY - event.clientY) * 2 * Math.PI / canvas.height;
+	body.transformation = body.transformation.mul(
+		new Matrix3D().rotationY(deltaX).mul(
+			new Matrix3D().rotationX(deltaY)));
+  	scene.update(canvas.width / 2,canvas.width,canvas.height);
+  	gc.clearRect(0,0,canvas.width,canvas.height);
+  	scene.paint(gc);  
+	dragX = event.clientX;
+	dragY = event.clientY;
+  }
+}
+
+function mouseup(event) {
+	dragX = dragY = 0;
+}
+
+function draw() {
+	if (nbTrans > 0) { 
+	  scene.transformation = 
+		scene.transformation.mul(
+		  new Matrix3D().translation(0,0,deltaZ));
+	  body.transformation = 
+	    body.transformation.mul(
+		  new Matrix3D().rotationY(Math.PI/48));
+	  rightArm.transformation = 
+		rightArm.transformation.mul(
+		  new Matrix3D().rotationX(Math.PI/12));
+	  rightLeg.transformation = 
+		rightLeg.transformation.mul(
+		  new Matrix3D().rotationX(-legSign * Math.PI/36));
+	  leftLeg.transformation = 
+		leftLeg.transformation.mul(
+		  new Matrix3D().rotationX( legSign * Math.PI/36));
+	  scene.update(canvas.width / 2,canvas.width,canvas.height);
+	  gc.clearRect(0,0,canvas.width,canvas.height);
+	  scene.paint(gc);  
+	  nbTrans--;
+	  if (nbTrans % 100 == 0)
+		  deltaZ = -deltaZ;
+	  if (nbTrans % 15 == 0)
+		  legSign = -legSign;
 	}
+	else
+	  clearInterval(drawId);
 }
 
-function writelnToOutputZone() {
-	var i = 0;
-	while (i < arguments.length) {
-		document.getElementById('outputZone').innerHTML += arguments[i];
-		i++;
-	}
-	document.getElementById('outputZone').innerHTML += "<br/>";
-}
+function createScene() {
+	var nb,total,r,h,w,d,fx,fr;
 
-function runScript(inText) {
-	clearZones();
-	var evalText = inText.replace(/document\.writeln/g,"writelnToOutputZone");
-	evalText = evalText.replace(/document\.write/g,"writeToOutputZone");
-	eval(evalText);
-}
+	canvas = document.getElementById("outputCanvas");
+	gc = canvas.getContext("2d");
 
-function clearZones() {
-	document.getElementById('outputZone').innerHTML = "";
-	var canvas = document.getElementById("outputCanvas");
-	canvas.width = canvas.width; // force erase
+	fx=1; fr=1;
+	total = nb = 9;
+
+	scene = new Object3D();
+
+	body = obj = new PolyCylinder(total, nb, 100, 25);
+	obj.color = "#7F007F";
+	obj.reset(0, 0, 0, 0, 0, 0, 0, Math.PI, 0, 0, 0, 0);
+	scene.addChild(obj);
+
+	obj = new PolyCone(total, nb, 30, 45);
+	obj.color = "#FFFF00";
+	obj.reset(0, 110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	scene.getChild(0).addChild(obj);
+
+	obj = new PolySphere(total, nb, 33.33, fr);
+	obj.color = "#3F3F7F";
+	obj.reset(0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	scene.getChild(0).addChild(obj);
+
+	obj = new PolyCylinder(total, nb, 120, 10);
+	obj.color = "#7F3F00";
+	obj.reset(-35, 50, 0, 0, -60, 0, Math.PI/8, 0, Math.PI/16, 0, 0, 0);
+	scene.getChild(0).addChild(obj);
+
+	rightArm = obj = new PolyCylinder(total, nb, 120, 10);
+	obj.color = "#007F3F";
+	obj.reset(35, 50, 0, 0, -60, 0, -Math.PI/12, 0, 0, 0, 0, 0);
+	scene.getChild(0).addChild(obj);
+
+	leftLeg = obj = new PolyCylinder(total, nb, 125, 12.5);
+	obj.reset(-12.5, -50, 0, 0, -62.5, 0,-Math.PI/12, 0, 0, 0, 0, 0);
+	scene.getChild(0).addChild(obj);
+
+	obj = new Box(25, 10.5, 31.25, fx);
+	obj.color = "#000000";
+	obj.reset(0, -130, 8.5, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	scene.getChild(0).getChild(4).addChild(obj);
+
+	rightLeg = obj = new PolyCylinder(total, nb, 125, 12.5);
+	obj.reset( 12.5, -50, 0, 0, -62.5, 0, Math.PI/12, 0, 0, 0, 0, 0);
+	scene.getChild(0).addChild(obj);
+
+	obj = new Box(25, 10.5, 31.25, fx);
+	obj.color = "#000000";
+	obj.reset(0, -130, 8.5, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	scene.getChild(0).getChild(5).addChild(obj);
+
+	
+	scene.reset(0, 0, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	scene.update(canvas.width / 2,canvas.width,canvas.height);
+	scene.paint(gc);
+	
+	nbTrans = 1000;
+	deltaZ = 5;
+	legSign = 1;
+	drawId = setInterval(draw,80);
 }
 
 </script>
 
-<body>
+
+<body onLoad="createScene()">
 
 <center><h1>mini3D on HTML5 canvas</h1></center>
 
 <hr/>
 
 <center>
-<canvas id="outputCanvas" width="480" height="320"></canvas>
+<canvas id="outputCanvas" width="480" height="320" 
+  onmousedown="mousedown(event)"
+  onmousemove="mousemove(event)"
+  onmouseup="mouseup(event)"
+  onmouseout="mouseup(event)"
+  >
+</canvas>
 </center>
 
 <hr/>
-
-<form>
-
-<center>
-<textarea id="sourceTextArea" rows="20" cols="80">
-
-var canvas = document.getElementById("outputCanvas");
-var gc = canvas.getContext("2d");
-
-gc.strokeRect(0,0,canvas.width,canvas.height);
-
-var nb,total,focal,cw,ch,r,h,w,d,fx,fr;
-cw=canvas.width; ch=canvas.height;
-focal = canvas.width / 2;
-
-document.writeln("Canvas: ", canvas, " ", cw, "x", ch, " gc: ", gc);
-
-w=60; h=20; d=30; fx=1;
-
-var scene, obj;
-scene = new Object3D();
-
-obj = new Box(w, h, d, fx);
-obj.color = "#FF00FF";
-obj.reset(-200, 0, 300, 0, 0, 0, Math.PI / 6, Math.PI / 3, -Math.PI / 6, 0, 0, 0);
-//obj.update(focal,cw,ch);
-//obj.paint(gc);
-document.writeln("Objet ", obj.mesh.nVertex, " sommets ", obj.mesh.nEdge, " arcs");
-scene.addChild(obj);
-
-total = nb = 9;
-r=w/2;
-fr=1;
-
-obj = new PolySphere(total, nb, r*3, fr);
-obj.color = "#FF0000";
-obj.reset(-60, 40, 250, 0, 0, 0, Math.PI / 6, Math.PI / 3, -Math.PI / 6, 0, 0, 0);
-//obj.update(focal,cw,ch);
-//obj.paint(gc);
-document.writeln("Objet ", obj.mesh.nVertex, " sommets ", obj.mesh.nEdge, " arcs");
-scene.addChild(obj);
-
-obj = new PolyCone(total, nb, h, r)
-obj.color = "#00FF00";
-obj.reset(60, -40, 200, 0, 0, 0, Math.PI / 6, Math.PI / 3, -Math.PI / 6, 0, 0, 0);
-//obj.update(focal,cw,ch);
-//obj.paint(gc);
-document.writeln("Objet ", obj.mesh.nVertex, " sommets ", obj.mesh.nEdge, " arcs");
-scene.addChild(obj);
-
-obj = new PolyCylinder(total, nb, h, r)
-obj.color = "#0000FF";
-obj.reset(200, 0, 350, 0, 0, 0, Math.PI / 6, Math.PI / 3, -Math.PI / 6, 0, 0, 0);
-//obj.update(focal,cw,ch);
-//obj.paint(gc);
-document.writeln("Objet ", obj.mesh.nVertex, " sommets ", obj.mesh.nEdge, " arcs");
-scene.addChild(obj);
-
-scene.reset(0, 0, 100, 0, Math.PI, 0, 0, 0, 0, 0, 0, 0);
-scene.update(focal,cw,ch);
-scene.paint(gc);
-document.writeln("Scene ", scene.nChild, " sous objets.");
-
-var nbTrans = 10;
-while (nbTrans > 0) { 
-  scene.transformation = 
-    scene.transformation.mul(
-      new Matrix3D().translation(0,0,300));
-  scene.update(focal,cw,ch);
-  scene.paint(gc);  
-  nbTrans--;
-}
-
-
-</textarea>
-</center>
-
-<br/>
-
-<input type="button" value="ex&eacute;cuter"
-	onclick="runScript(document.getElementById('sourceTextArea').value,document.getElementById('outputZone'))" />
-<input type="reset" value="effacer" onclick="clearZones()"/>
-	
-</form>
-
-<hr/>
-
-<div id="outputZone"></div>
-
+<div id="outLog"></div>
 </body>
 </html>
 
