@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) 2010, Luc Yriarte
+ * All rights reserved.
+ * 
+ * License: BSD <http://www.opensource.org/licenses/bsd-license.php>
+ * 
+ */
 function Object3D()
 {
-	this.color = "#7F7F7F";
+	this.color = null;
 	
 	this.mesh = new Mesh(0,0,null,null);
 	this.position = new Matrix3D();
@@ -12,10 +19,8 @@ function Object3D()
 	this.nFacet = 0;
 	this.nFacetTotal = 0;
 	
-	this.child = new Array();
+	this.child = null;
 	this.parent = null;
-	this.facet = new Array();
-	this.facetTotal = new Array();
 	return this;
 };
 
@@ -95,6 +100,10 @@ Object3D.prototype.transformMeshes = function(trans)
 Object3D.prototype.addChild = function(obj)
 {
 	obj.parent = this;
+	if (obj.color == null)
+		obj.color = this.color;
+	if (this.child == null)
+		this.child = new Array();
 	this.child.push(obj);
 	this.nChild++;
 	return this;

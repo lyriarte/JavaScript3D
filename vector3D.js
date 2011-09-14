@@ -1,4 +1,10 @@
-
+/*
+ * Copyright (c) 2010, Luc Yriarte
+ * All rights reserved.
+ * 
+ * License: BSD <http://www.opensource.org/licenses/bsd-license.php>
+ * 
+ */
 Vector3D.prototype = new Vector;
 
 function Vector3D(x,y,z) {

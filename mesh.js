@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2010, Luc Yriarte
+ * All rights reserved.
+ * 
+ * License: BSD <http://www.opensource.org/licenses/bsd-license.php>
+ * 
+ */
 function Mesh(nV, nE, v, e) 
 {
 	this.nVertex = nV;
@@ -81,7 +88,7 @@ Mesh.prototype.drawWireframe = function(gc, color)
 		if (this.lines[i][4] >= 0)
 			gc.lineTo(this.lines[i][2], this.lines[i][3]);
 	}
-	gc.strokeStyle = color;
+	gc.strokeStyle = color == null ? "#7F7F7F" : color;
 	gc.stroke();
 	gc.closePath();
 	return this;

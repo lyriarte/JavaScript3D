@@ -1,6 +1,14 @@
+/*
+ * Copyright (c) 2010, Luc Yriarte
+ * All rights reserved.
+ * 
+ * License: BSD <http://www.opensource.org/licenses/bsd-license.php>
+ * 
+ */
 PolyCylinder.prototype = new Object3D;
 
-function PolyCylinder(nTotal, n, h, r) {
+function PolyCylinder(nTotal, n, h, r) 
+{
 	if (n < 3)
 		n = 3;
 	var dh = h / 2;
@@ -28,4 +36,3 @@ function PolyCylinder(nTotal, n, h, r) {
 	this.mesh = new Mesh(n * 2, n * 3, v, e);
 	return this;
 };
-
