@@ -18,12 +18,40 @@
 
 <script type="text/javascript">
 
+var canvas, gc, outLog, xmlDoc, xmlhttp;
 
-var canvas = document.getElementById("outputCanvas");
-var gc = canvas.getContext("2d");
-var outLog = document.getElementById("outLog");
+function doAjaxQuery(method, url) {
+  xmlhttp=new XMLHttpRequest();
+  xmlhttp.onreadystatechange=function() {
+  outLog.innerHTML += "readyState:" + xmlhttp.readyState + "  status:" + xmlhttp.status + "<hr>";
+    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+      var parser=new DOMParser();
+      xmlDoc = parser.parseFromString(xmlhttp.responseText, "text/xml");
+      walkDOM(xmlDoc, "-");
+    }
+}
 
-var canvas, gc, drawId, nbTrans;
+  xmlhttp.open(method, url, true);
+  xmlhttp.send();
+}
+
+function walkDOM(element, tab) {
+  if (element.tagName) {
+    outLog.innerHTML += tab + element.tagName + " ( " + element.attributes.length  + " ) <br>";
+    for (var iatt=0; iatt < element.attributes.length; iatt++) {
+      outLog.innerHTML += element.attributes.item(iatt).name + ":" + element.attributes.item(iatt).value + " ";
+    }
+    outLog.innerHTML += "<br>";
+  }
+  var child = element.firstChild;
+  while(child) {
+    walkDOM(child, tab + "-");
+    child = child.nextSibling;
+  }
+}
+
+
+var drawId, nbTrans;
 
 var scene, obj, body, rightArm, leftLeg, rightLeg, legSign, deltaZ, dragX, dragY;
 
@@ -84,6 +112,7 @@ function draw() {
 function createScene() {
 	var nb,total,r,h,w,d,fx,fr;
 
+	outLog = document.getElementById("outLog");
 	canvas = document.getElementById("outputCanvas");
 	gc = canvas.getContext("2d");
 
@@ -144,6 +173,10 @@ function createScene() {
 	deltaZ = 5;
 	legSign = 1;
 	drawId = setInterval(draw,80);
+
+	var getUrl = "http://127.0.0.1/x3d/plane.x3d";
+	outLog.innerHTML = "<b>Loading </b>" + getUrl;
+	doAjaxQuery("GET", getUrl);
 }
 
 </script>
