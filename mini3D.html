@@ -15,6 +15,7 @@
 <script type="text/javascript" src="polySphere.js"></script>
 <script type="text/javascript" src="polyCylinder.js"></script>
 <script type="text/javascript" src="polyCone.js"></script>
+<script type="text/javascript" src="x3d.js"></script>
 
 <script type="text/javascript">
 
@@ -24,11 +25,14 @@ function doAjaxQuery(method, url) {
   xmlhttp=new XMLHttpRequest();
   xmlhttp.onreadystatechange=function() {
   outLog.innerHTML += "readyState:" + xmlhttp.readyState + "  status:" + xmlhttp.status + "<hr>";
-    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-      var parser=new DOMParser();
-      xmlDoc = parser.parseFromString(xmlhttp.responseText, "text/xml");
-      walkDOM(xmlDoc, "-");
-    }
+	if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+		var parser=new DOMParser();
+		xmlDoc = parser.parseFromString(xmlhttp.responseText, "text/xml");
+		walkDOM(xmlDoc, "-");
+		outLog.innerHTML += "<hr>";
+		var xxx = new x3d();
+		var scene = xxx.getScene(xmlDoc);
+	}
 }
 
   xmlhttp.open(method, url, true);
@@ -174,8 +178,8 @@ function createScene() {
 	legSign = 1;
 	drawId = setInterval(draw,80);
 
-	var getUrl = "http://127.0.0.1/x3d/plane.x3d";
-	outLog.innerHTML = "<b>Loading </b>" + getUrl;
+	var getUrl = "http://127.0.0.1/x3d/axes.wrl.x3d";
+	outLog.innerHTML = "<b>Loading </b>" + getUrl + "<br>";
 	doAjaxQuery("GET", getUrl);
 }
 
