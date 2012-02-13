@@ -32,10 +32,10 @@ outLog.innerHTML += "getObject3D: " + aTransformGroup.tagName + "<br>";
 		if (aTransformGroup.attributes.item(iatt).name == "translation") {
 			obj.setPosition(this.getTranslation(aTransformGroup.attributes.item(iatt).value));
 		}
-		if (aTransformGroup.attributes.item(iatt).name == "rotation") {
+		else if (aTransformGroup.attributes.item(iatt).name == "rotation") {
 			obj.setOrientation(this.getRotation(aTransformGroup.attributes.item(iatt).value));
 		}
-		if (aTransformGroup.attributes.item(iatt).name == "scale") {
+		else if (aTransformGroup.attributes.item(iatt).name == "scale") {
 			scale = this.getScale(aTransformGroup.attributes.item(iatt).value);
 		}
 	}
@@ -60,10 +60,79 @@ x3d.prototype.getColor = function(aShape) {
 x3d.prototype.getShape = function(aShape) {
 outLog.innerHTML += "getShape: " + aShape.tagName + "<br>";
 	var obj = null;
-obj= new Object3D();	
+	var child = aShape.firstChild;
+	while(child) {
+		if (child.tagName == "Cone") {
+			obj = this.getCone(child);
+		}
+		else if (child.tagName == "Cylinder") {
+			obj = this.getCylinder(child);
+		}
+		else if (child.tagName == "Sphere") {
+			obj = this.getSphere(child);
+		}
+		else if (child.tagName == "Box") {
+			obj = this.getBox(child);
+		}
+		child = child.nextSibling;
+	}
+	if (!obj)
+		obj = new Object3D();
 	return obj;
 }
 
+x3d.prototype.getCone = function(aNode) {
+	var h=1;
+	var r=1;
+	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
+		if (aNode.attributes.item(iatt).name == "height") {
+			h=parseFloat(aNode.attributes.item(iatt).value);
+		}
+		else if (aNode.attributes.item(iatt).name == "bottomRadius") {
+			r=parseFloat(aNode.attributes.item(iatt).value);
+		}
+	}
+	return new PolyCone(6,6,h,r);
+}
+
+x3d.prototype.getCylinder = function(aNode) {
+	var h=1;
+	var r=1;
+	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
+		if (aNode.attributes.item(iatt).name == "height") {
+			h=parseFloat(aNode.attributes.item(iatt).value);
+		}
+		else if (aNode.attributes.item(iatt).name == "radius") {
+			r=parseFloat(aNode.attributes.item(iatt).value);
+		}
+	}
+	return new PolyCylinder(6,6,h,r);
+}
+
+x3d.prototype.getSphere = function(aNode) {
+	var r=1;
+	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
+		if (aNode.attributes.item(iatt).name == "radius") {
+			r=parseFloat(aNode.attributes.item(iatt).value);
+		}
+	}
+	return new PolySphere(6,6,r,1);
+}
+
+x3d.prototype.getBox = function(aNode) {
+	var x=1;
+	var y=1;
+	var z=1;
+	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
+		if (aNode.attributes.item(iatt).name == "size") {
+			var xyz = aNode.attributes.item(iatt).value.match(/\S+/g);
+			x=parseFloat(xyz[0]);
+			y=parseFloat(xyz[1]);
+			z=parseFloat(xyz[2]);
+		}
+	}
+	return new Box(x,y,z,1);
+}
 
 x3d.prototype.getTranslation = function(tosplit) {
 outLog.innerHTML += "getTranslation: " + tosplit + "<br>";
