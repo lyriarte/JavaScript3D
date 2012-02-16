@@ -9,11 +9,32 @@
 function x3d() {
 	this.xmlDoc = null;
 	this.scene = null;
+	this.defNodes = new Array();
 	return this;
+}
+
+x3d.prototype.defKey = function(aNode) {
+	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
+		if (aNode.attributes.item(iatt).name == "DEF") {
+			this.defNodes[aNode.attributes.item(iatt).value] = aNode;
+			break;
+		}
+	}
+}
+
+x3d.prototype.useKey = function(aNode) {
+	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
+		if (aNode.attributes.item(iatt).name == "USE") {
+			return this.defNodes[aNode.attributes.item(iatt).value];
+		}
+	}
+	return aNode;
 }
 
 x3d.prototype.getObject3D = function(aTransformGroup) {
 outLog.innerHTML += "getObject3D: " + aTransformGroup.tagName + "<br>";
+	this.defKey(aTransformGroup);
+	aTransformGroup = this.useKey(aTransformGroup);
 	var obj = null;
 	var child = aTransformGroup.firstChild;
 	while(child) {
@@ -51,7 +72,7 @@ outLog.innerHTML += "getObject3D: " + aTransformGroup.tagName + "<br>";
 }
 
 	
-x3d.prototype.getColor = function(aShape) {
+x3d.prototype.getColor = function(aNode) {
 	var rgb = null;
 	return rgb;
 }
@@ -59,6 +80,8 @@ x3d.prototype.getColor = function(aShape) {
 
 x3d.prototype.getShape = function(aShape) {
 outLog.innerHTML += "getShape: " + aShape.tagName + "<br>";
+	this.defKey(aShape);
+	aShape = this.useKey(aShape);
 	var obj = null;
 	var child = aShape.firstChild;
 	while(child) {
@@ -171,8 +194,6 @@ outLog.innerHTML += "getScale: " + tosplit + "<br>";
 x3d.prototype.getScene = function(xmlDoc) {
 	this.xmlDoc = xmlDoc;
 	var jScene = this.xmlDoc.getElementsByTagName("Scene")[0];
-outLog.innerHTML += "<hr>";
-outLog.innerHTML += jScene.tagName + "<br>";
 	this.scene = this.getObject3D(jScene);
 	return this.scene;
 }
