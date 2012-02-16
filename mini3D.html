@@ -3,7 +3,6 @@
 <head>
 <title>mini3D</title>
 <link rel="stylesheet" type="text/css" href="/css/luc.css" />
-</head>
 
 <script type="text/javascript" src="matrix.js"></script>
 <script type="text/javascript" src="vector.js"></script>
@@ -19,164 +18,29 @@
 
 <script type="text/javascript">
 
-var canvas, gc, outLog, xmlDoc, xmlhttp;
+var scene, canvas, gc, outLog, xmlDoc, xmlhttp;
 
 function doAjaxQuery(method, url) {
   xmlhttp=new XMLHttpRequest();
   xmlhttp.onreadystatechange=function() {
-  outLog.innerHTML += "readyState:" + xmlhttp.readyState + "  status:" + xmlhttp.status + "<hr>";
-	if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-		var parser=new DOMParser();
-		xmlDoc = parser.parseFromString(xmlhttp.responseText, "text/xml");
-		walkDOM(xmlDoc, "-");
-		outLog.innerHTML += "<hr>";
-		var xxx = new x3d();
-		var scene = xxx.getScene(xmlDoc);
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+			var parser=new DOMParser();
+			xmlDoc = parser.parseFromString(xmlhttp.responseText, "text/xml");
+			var xxx = new x3d();
+			scene = xxx.getScene(xmlDoc);
+			scene.reset(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			scene.update(canvas.width / 2,canvas.width,canvas.height);
+			scene.paint(gc);
+		}
 	}
-}
-
   xmlhttp.open(method, url, true);
   xmlhttp.send();
 }
 
-function walkDOM(element, tab) {
-  if (element.tagName) {
-    outLog.innerHTML += tab + element.tagName + " ( " + element.attributes.length  + " ) <br>";
-    for (var iatt=0; iatt < element.attributes.length; iatt++) {
-      outLog.innerHTML += element.attributes.item(iatt).name + ":" + element.attributes.item(iatt).value + " ";
-    }
-    outLog.innerHTML += "<br>";
-  }
-  var child = element.firstChild;
-  while(child) {
-    walkDOM(child, tab + "-");
-    child = child.nextSibling;
-  }
-}
-
-
-var drawId, nbTrans;
-
-var scene, obj, body, rightArm, leftLeg, rightLeg, legSign, deltaZ, dragX, dragY;
-
-function mousedown(event) {
-	dragX = event.clientX;
-	dragY = event.clientY;
-}
-
-function mousemove(event) {
-  if (scene && body && rightArm && dragX && dragY) {
-	var deltaX = (event.clientX - dragX) * 2 * Math.PI / canvas.width;
-	var deltaY = (dragY - event.clientY) * 2 * Math.PI / canvas.height;
-	body.transformation = body.transformation.mul(
-		new Matrix3D().rotationY(deltaX).mul(
-			new Matrix3D().rotationX(deltaY)));
-  	scene.update(canvas.width / 2,canvas.width,canvas.height);
-  	gc.clearRect(0,0,canvas.width,canvas.height);
-  	scene.paint(gc);  
-	dragX = event.clientX;
-	dragY = event.clientY;
-  }
-}
-
-function mouseup(event) {
-	dragX = dragY = 0;
-}
-
-function draw() {
-	if (nbTrans > 0) { 
-	  scene.transformation = 
-		scene.transformation.mul(
-		  new Matrix3D().translation(0,0,deltaZ));
-	  body.transformation = 
-	    body.transformation.mul(
-		  new Matrix3D().rotationY(Math.PI/48));
-	  rightArm.transformation = 
-		rightArm.transformation.mul(
-		  new Matrix3D().rotationX(Math.PI/12));
-	  rightLeg.transformation = 
-		rightLeg.transformation.mul(
-		  new Matrix3D().rotationX(-legSign * Math.PI/36));
-	  leftLeg.transformation = 
-		leftLeg.transformation.mul(
-		  new Matrix3D().rotationX( legSign * Math.PI/36));
-	  scene.update(canvas.width / 2,canvas.width,canvas.height);
-	  gc.clearRect(0,0,canvas.width,canvas.height);
-	  scene.paint(gc);  
-	  nbTrans--;
-	  if (nbTrans % 100 == 0)
-		  deltaZ = -deltaZ;
-	  if (nbTrans % 15 == 0)
-		  legSign = -legSign;
-	}
-	else
-	  clearInterval(drawId);
-}
-
-function createScene() {
-	var nb,total,r,h,w,d,fx,fr;
-
+function initScene() {
 	outLog = document.getElementById("outLog");
 	canvas = document.getElementById("outputCanvas");
 	gc = canvas.getContext("2d");
-
-	fx=1; fr=1;
-	total = nb = 9;
-
-	scene = new Object3D();
-
-	body = obj = new PolyCylinder(total, nb, 100, 25);
-	obj.color = "#7F007F";
-	obj.reset(0, 0, 0, 0, 0, 0, 0, Math.PI, 0, 0, 0, 0);
-	scene.addChild(obj);
-
-	obj = new PolyCone(total, nb, 30, 45);
-	obj.color = "#FFFF00";
-	obj.reset(0, 110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	scene.getChild(0).addChild(obj);
-
-	obj = new PolySphere(total, nb, 33.33, fr);
-	obj.color = "#3F3F7F";
-	obj.reset(0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	scene.getChild(0).addChild(obj);
-
-	obj = new PolyCylinder(total, nb, 120, 10);
-	obj.color = "#7F3F00";
-	obj.reset(-35, 50, 0, 0, -60, 0, Math.PI/8, 0, Math.PI/16, 0, 0, 0);
-	scene.getChild(0).addChild(obj);
-
-	rightArm = obj = new PolyCylinder(total, nb, 120, 10);
-	obj.color = "#007F3F";
-	obj.reset(35, 50, 0, 0, -60, 0, -Math.PI/12, 0, 0, 0, 0, 0);
-	scene.getChild(0).addChild(obj);
-
-	leftLeg = obj = new PolyCylinder(total, nb, 125, 12.5);
-	obj.reset(-12.5, -50, 0, 0, -62.5, 0,-Math.PI/12, 0, 0, 0, 0, 0);
-	scene.getChild(0).addChild(obj);
-
-	obj = new Box(25, 10.5, 31.25, fx);
-	obj.color = "#000000";
-	obj.reset(0, -130, 8.5, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	scene.getChild(0).getChild(4).addChild(obj);
-
-	rightLeg = obj = new PolyCylinder(total, nb, 125, 12.5);
-	obj.reset( 12.5, -50, 0, 0, -62.5, 0, Math.PI/12, 0, 0, 0, 0, 0);
-	scene.getChild(0).addChild(obj);
-
-	obj = new Box(25, 10.5, 31.25, fx);
-	obj.color = "#000000";
-	obj.reset(0, -130, 8.5, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	scene.getChild(0).getChild(5).addChild(obj);
-
-	
-	scene.reset(0, 0, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	scene.update(canvas.width / 2,canvas.width,canvas.height);
-	scene.paint(gc);
-	
-	nbTrans = 1000;
-	deltaZ = 5;
-	legSign = 1;
-	drawId = setInterval(draw,80);
 
 	var getUrl = "http://127.0.0.1/x3d/axes.wrl.x3d";
 	outLog.innerHTML = "<b>Loading </b>" + getUrl + "<br>";
@@ -184,21 +48,17 @@ function createScene() {
 }
 
 </script>
+</head>
 
 
-<body onLoad="createScene()">
+<body onLoad="initScene()">
 
 <center><h1>mini3D on HTML5 canvas</h1></center>
 
 <hr/>
 
 <center>
-<canvas id="outputCanvas" width="480" height="320" 
-  onmousedown="mousedown(event)"
-  onmousemove="mousemove(event)"
-  onmouseup="mouseup(event)"
-  onmouseout="mouseup(event)"
-  >
+<canvas id="outputCanvas" width="480" height="320">
 </canvas>
 </center>
 
@@ -206,4 +66,3 @@ function createScene() {
 <div id="outLog"></div>
 </body>
 </html>
-
