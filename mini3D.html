@@ -18,7 +18,33 @@
 
 <script type="text/javascript">
 
-var scene, canvas, gc, outLog, xmlDoc, xmlhttp;
+var scene, model, canvas, gc, outLog, xmlDoc, xmlhttp;
+
+var deltaZ, dragX, dragY;
+
+function mousedown(event) {
+	dragX = event.clientX;
+	dragY = event.clientY;
+}
+
+function mousemove(event) {
+  if (scene && model && dragX && dragY) {
+	var deltaX = (event.clientX - dragX) * 2 * Math.PI / canvas.width;
+	var deltaY = (dragY - event.clientY) * 2 * Math.PI / canvas.height;
+	model.transformation = model.transformation.mul(
+		new Matrix3D().rotationY(deltaX).mul(
+			new Matrix3D().rotationX(deltaY)));
+  	scene.update(canvas.width / 2,canvas.width,canvas.height);
+  	gc.clearRect(0,0,canvas.width,canvas.height);
+  	scene.paint(gc);  
+	dragX = event.clientX;
+	dragY = event.clientY;
+  }
+}
+
+function mouseup(event) {
+	dragX = dragY = 0;
+}
 
 function doAjaxQuery(method, url) {
   xmlhttp=new XMLHttpRequest();
@@ -31,6 +57,7 @@ function doAjaxQuery(method, url) {
 			scene.reset(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 			scene.update(canvas.width / 2,canvas.width,canvas.height);
 			scene.paint(gc);
+			model = scene.getChild(0);
 		}
 	}
   xmlhttp.open(method, url, true);
@@ -58,7 +85,12 @@ function initScene() {
 <hr/>
 
 <center>
-<canvas id="outputCanvas" width="480" height="320">
+<canvas id="outputCanvas" width="480" height="320" 
+  onmousedown="mousedown(event)"
+  onmousemove="mousemove(event)"
+  onmouseup="mouseup(event)"
+  onmouseout="mouseup(event)"
+  >
 </canvas>
 </center>
 
