@@ -53,11 +53,12 @@ function doAjaxQuery(method, url) {
 			var parser=new DOMParser();
 			xmlDoc = parser.parseFromString(xmlhttp.responseText, "text/xml");
 			var xxx = new x3d();
-			scene = xxx.getScene(xmlDoc);
-			scene.reset(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			model = xxx.getScene(xmlDoc);
+			scene = new Object3D();
+			scene.addChild(model);
+			scene.reset(0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 			scene.update(canvas.width / 2,canvas.width,canvas.height);
 			scene.paint(gc);
-			model = scene.getChild(0);
 		}
 	}
   xmlhttp.open(method, url, true);
@@ -69,7 +70,7 @@ function initScene() {
 	canvas = document.getElementById("outputCanvas");
 	gc = canvas.getContext("2d");
 
-	var getUrl = "http://127.0.0.1/x3d/axes.wrl.x3d";
+	var getUrl = "http://127.0.0.1/x3d/AllenDuttonVillage.x3d";
 	outLog.innerHTML = "<b>Loading </b>" + getUrl + "<br>";
 	doAjaxQuery("GET", getUrl);
 }
