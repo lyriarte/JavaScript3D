@@ -32,7 +32,6 @@ x3d.prototype.useKey = function(aNode) {
 }
 
 x3d.prototype.getObject3D = function(aTransformGroup) {
-outLog.innerHTML += "getObject3D: " + aTransformGroup.tagName + "<br>";
 	this.defKey(aTransformGroup);
 	aTransformGroup = this.useKey(aTransformGroup);
 	var obj = null;
@@ -72,20 +71,40 @@ outLog.innerHTML += "getObject3D: " + aTransformGroup.tagName + "<br>";
 }
 
 	
-x3d.prototype.getColor = function(aNode) {
-	var rgb = null;
-	return rgb;
+x3d.prototype.getColor = function(aAppearance) {
+	this.defKey(aAppearance);
+	aAppearance = this.useKey(aAppearance);
+	var color = null;
+	var child = aAppearance.firstChild;
+	while(child) {
+		if (child.tagName == "Material") {
+			for (var iatt=0; iatt < child.attributes.length; iatt++) {
+				if (child.attributes.item(iatt).name == "diffuseColor") {
+					var rgb = child.attributes.item(iatt).value.match(/\S+/g);
+					color = "#" + (Math.round(255*parseFloat(rgb[0]))).toString(16) 
+						+ (Math.round(255*parseFloat(rgb[1]))).toString(16) 
+						+ (Math.round(255*parseFloat(rgb[2]))).toString(16);
+					return color;
+				}
+			}
+		}
+		child = child.nextSibling;
+	}
+	return color;
 }
 
 
 x3d.prototype.getShape = function(aShape) {
-outLog.innerHTML += "getShape: " + aShape.tagName + "<br>";
 	this.defKey(aShape);
 	aShape = this.useKey(aShape);
 	var obj = null;
+	var color = null;
 	var child = aShape.firstChild;
 	while(child) {
-		if (child.tagName == "Cone") {
+		if (child.tagName == "Appearance") {
+			color = this.getColor(child);
+		}
+		else if (child.tagName == "Cone") {
 			obj = this.getCone(child);
 		}
 		else if (child.tagName == "Cylinder") {
@@ -101,6 +120,8 @@ outLog.innerHTML += "getShape: " + aShape.tagName + "<br>";
 	}
 	if (!obj)
 		obj = new Object3D();
+	if (color)
+		obj.color = color;
 	return obj;
 }
 
@@ -158,7 +179,6 @@ x3d.prototype.getBox = function(aNode) {
 }
 
 x3d.prototype.getTranslation = function(tosplit) {
-outLog.innerHTML += "getTranslation: " + tosplit + "<br>";
 	var xyz = tosplit.match(/\S+/g);
 	var m3d = new Matrix3D().translation(parseFloat(xyz[0]),parseFloat(xyz[1]),-parseFloat(xyz[2]));
 	return m3d;
@@ -166,7 +186,6 @@ outLog.innerHTML += "getTranslation: " + tosplit + "<br>";
 
 
 x3d.prototype.getRotation = function(tosplit) {
-outLog.innerHTML += "getRotation: " + tosplit + "<br>";
 	var xyza = tosplit.match(/\S+/g);
 	var fx = parseFloat(xyza[0]);
 	var fy = parseFloat(xyza[1]);
@@ -184,7 +203,6 @@ outLog.innerHTML += "getRotation: " + tosplit + "<br>";
 
 
 x3d.prototype.getScale = function(tosplit) {
-outLog.innerHTML += "getScale: " + tosplit + "<br>";
 	var xyz = tosplit.match(/\S+/g);
 	var m3d = new Matrix3D().scale(parseFloat(xyz[0]),parseFloat(xyz[1]),-parseFloat(xyz[2]));
 	return m3d;
@@ -194,6 +212,12 @@ outLog.innerHTML += "getScale: " + tosplit + "<br>";
 x3d.prototype.getScene = function(xmlDoc) {
 	this.xmlDoc = xmlDoc;
 	var jScene = this.xmlDoc.getElementsByTagName("Scene")[0];
+	var child = jScene.firstChild;
+	while(child) {
+		if (child.tagName == "Appearance")
+			this.getColor(child);
+		child = child.nextSibling;
+	}
 	this.scene = this.getObject3D(jScene);
 	return this.scene;
 }
