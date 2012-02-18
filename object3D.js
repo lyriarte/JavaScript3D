@@ -28,21 +28,21 @@ Object3D.prototype.reset = function(trnX, trnY, trnZ, trn0X, trn0Y, trn0Z,
 		rotX, rotY, rotZ, rot0X, rot0Y, rot0Z) 
 {
 	if (rot0X)
-		this.mesh = this.mesh.transform(new Matrix3D().rotationX(rot0X));
+		this.mesh = this.mesh.transform(Matrix3D.rotationX(rot0X));
 	if (rot0Y)
-		this.mesh = this.mesh.transform(new Matrix3D().rotationY(rot0Y));
+		this.mesh = this.mesh.transform(Matrix3D.rotationY(rot0Y));
 	if (rot0Z)
-		this.mesh = this.mesh.transform(new Matrix3D().rotationZ(rot0Z));
+		this.mesh = this.mesh.transform(Matrix3D.rotationZ(rot0Z));
 	if (trn0X || trn0Y || trn0Z)
-		this.mesh = this.mesh.transform(new Matrix3D().translation(trn0X, trn0Y, trn0Z));
+		this.mesh = this.mesh.transform(Matrix3D.translation(trn0X, trn0Y, trn0Z));
 	if (rotX)
-		this.orientation = this.orientation.mul(new Matrix3D().rotationX(rotX));
+		this.orientation = this.orientation.mul(Matrix3D.rotationX(rotX));
 	if (rotY)
-		this.orientation = this.orientation.mul(new Matrix3D().rotationY(rotY));
+		this.orientation = this.orientation.mul(Matrix3D.rotationY(rotY));
 	if (rotZ)
-		this.orientation = this.orientation.mul(new Matrix3D().rotationZ(rotZ));
+		this.orientation = this.orientation.mul(Matrix3D.rotationZ(rotZ));
 	if (trnX || trnY || trnZ)
-		this.position = this.position.mul(new Matrix3D().translation(trnX, trnY, trnZ));
+		this.position = this.position.mul(Matrix3D.translation(trnX, trnY, trnZ));
 	this.transformation = this.position.mul(this.orientation);
 	this.updatedTransform = null;
 	for (var i = 0; i < this.nChild; i++) {
@@ -54,7 +54,7 @@ Object3D.prototype.reset = function(trnX, trnY, trnZ, trn0X, trn0Y, trn0Z,
 Object3D.prototype.resetScale = function(scaleX, scaleY, scaleZ) 
 {
 	if (scaleX != 1 || scaleY != 1 || scaleZ != 1)
-		this.mesh.transformThis(new Matrix3D().scale(scaleX, scaleY, scaleZ));
+		this.mesh.transformThis(Matrix3D.scale(scaleX, scaleY, scaleZ));
 	return this;
 };
 

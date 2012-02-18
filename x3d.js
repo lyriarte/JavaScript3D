@@ -184,7 +184,7 @@ x3d.prototype.getBox = function(aNode) {
 
 x3d.prototype.getTranslation = function(tosplit) {
 	var xyz = tosplit.match(/\S+/g);
-	var m3d = new Matrix3D().translation(parseFloat(xyz[0]),parseFloat(xyz[1]),-parseFloat(xyz[2]));
+	var m3d = Matrix3D.translation(parseFloat(xyz[0]),parseFloat(xyz[1]),-parseFloat(xyz[2]));
 	return m3d;
 }
 
@@ -197,18 +197,18 @@ x3d.prototype.getRotation = function(tosplit) {
 	var teta = parseFloat(xyza[3]);
 	var m3d = new Matrix3D();	
 	if (fx != 0)
-		m3d = m3d.mul(new Matrix3D().rotationX(teta * fx));
+		m3d = m3d.mul(Matrix3D.rotationX(teta * fx));
 	if (fy != 0)
-		m3d = m3d.mul(new Matrix3D().rotationY(teta * fy));
+		m3d = m3d.mul(Matrix3D.rotationY(teta * fy));
 	if (fz != 0)
-		m3d = m3d.mul(new Matrix3D().rotationZ(teta * fz));
+		m3d = m3d.mul(Matrix3D.rotationZ(teta * fz));
 	return m3d;
 }
 
 
 x3d.prototype.getScale = function(tosplit) {
 	var xyz = tosplit.match(/\S+/g);
-	var m3d = new Matrix3D().scale(parseFloat(xyz[0]),parseFloat(xyz[1]),-parseFloat(xyz[2]));
+	var m3d = Matrix3D.scale(parseFloat(xyz[0]),parseFloat(xyz[1]),-parseFloat(xyz[2]));
 	return m3d;
 }
 

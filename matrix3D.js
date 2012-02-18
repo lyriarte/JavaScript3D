@@ -13,7 +13,7 @@ function Matrix3D() {
 	return this;
 };
 
-Matrix3D.prototype.translation = function(x, y, z)
+Matrix3D.translation = function(x, y, z)
 {
 	var result = new Matrix3D();
 	result.cell[0][3] = x;
@@ -22,7 +22,7 @@ Matrix3D.prototype.translation = function(x, y, z)
 	return result;
 };
 
-Matrix3D.prototype.scale = function(x, y, z)
+Matrix3D.scale = function(x, y, z)
 {
 	var result = new Matrix3D();
 	result.cell[0][0] = x;
@@ -31,7 +31,7 @@ Matrix3D.prototype.scale = function(x, y, z)
 	return result;
 };
 
-Matrix3D.prototype.rotationX = function(teta)
+Matrix3D.rotationX = function(teta)
 {
 	var result = new Matrix3D();
 	result.cell[1][1] = Math.cos(teta);
@@ -41,7 +41,7 @@ Matrix3D.prototype.rotationX = function(teta)
 	return result;
 };
 
-Matrix3D.prototype.rotationY = function(teta)
+Matrix3D.rotationY = function(teta)
 {
 	var result = new Matrix3D();
 	result.cell[0][0] = Math.cos(teta);
@@ -51,7 +51,7 @@ Matrix3D.prototype.rotationY = function(teta)
 	return result;
 };
 
-Matrix3D.prototype.rotationZ = function(teta)
+Matrix3D.rotationZ = function(teta)
 {
 	var result = new Matrix3D();
 	result.cell[0][0] = Math.cos(teta);
