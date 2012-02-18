@@ -37,8 +37,8 @@ function mousemove(event) {
 	var deltaX = (event.clientX - dragX) * 2 * Math.PI / canvas.width;
 	var deltaY = (dragY - event.clientY) * 2 * Math.PI / canvas.height;
 	body.transformation = body.transformation.mul(
-		new Matrix3D().rotationY(deltaX).mul(
-			new Matrix3D().rotationX(deltaY)));
+		Matrix3D.rotationY(deltaX).mul(
+			Matrix3D.rotationX(deltaY)));
   	scene.update(canvas.width / 2,canvas.width,canvas.height);
   	gc.clearRect(0,0,canvas.width,canvas.height);
   	scene.paint(gc);  
@@ -55,19 +55,19 @@ function draw() {
 	if (nbTrans > 0) { 
 	  scene.transformation = 
 		scene.transformation.mul(
-		  new Matrix3D().translation(0,0,deltaZ));
+		  Matrix3D.translation(0,0,deltaZ));
 	  body.transformation = 
 	    body.transformation.mul(
-		  new Matrix3D().rotationY(Math.PI/48));
+		  Matrix3D.rotationY(Math.PI/48));
 	  rightArm.transformation = 
 		rightArm.transformation.mul(
-		  new Matrix3D().rotationX(Math.PI/12));
+		  Matrix3D.rotationX(Math.PI/12));
 	  rightLeg.transformation = 
 		rightLeg.transformation.mul(
-		  new Matrix3D().rotationX(-legSign * Math.PI/36));
+		  Matrix3D.rotationX(-legSign * Math.PI/36));
 	  leftLeg.transformation = 
 		leftLeg.transformation.mul(
-		  new Matrix3D().rotationX( legSign * Math.PI/36));
+		  Matrix3D.rotationX( legSign * Math.PI/36));
 	  scene.update(canvas.width / 2,canvas.width,canvas.height);
 	  gc.clearRect(0,0,canvas.width,canvas.height);
 	  scene.paint(gc);  
