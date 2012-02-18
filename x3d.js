@@ -81,9 +81,13 @@ x3d.prototype.getColor = function(aAppearance) {
 			for (var iatt=0; iatt < child.attributes.length; iatt++) {
 				if (child.attributes.item(iatt).name == "diffuseColor") {
 					var rgb = child.attributes.item(iatt).value.match(/\S+/g);
-					color = "#" + (Math.round(255*parseFloat(rgb[0]))).toString(16) 
-						+ (Math.round(255*parseFloat(rgb[1]))).toString(16) 
-						+ (Math.round(255*parseFloat(rgb[2]))).toString(16);
+					var r = (Math.round(255*parseFloat(rgb[0]))).toString(16);
+					if (r.length < 2) r = "0" + r;
+					var g = (Math.round(255*parseFloat(rgb[1]))).toString(16);
+					if (g.length < 2) g = "0" + g;
+					var b = (Math.round(255*parseFloat(rgb[2]))).toString(16);
+					if (b.length < 2) b = "0" + b;
+					color = "#" + r + g + b;
 					return color;
 				}
 			}
