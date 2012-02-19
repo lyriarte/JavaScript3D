@@ -56,7 +56,7 @@ function doAjaxQuery(method, url) {
 			model = xxx.getScene(xmlDoc);
 			scene = new Object3D();
 			scene.addChild(model);
-			scene.reset(0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+			scene.reset(0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 			scene.update(canvas.width / 2,canvas.width,canvas.height);
 			scene.paint(gc);
 		}
@@ -70,7 +70,7 @@ function initScene() {
 	canvas = document.getElementById("outputCanvas");
 	gc = canvas.getContext("2d");
 
-	var getUrl = "http://127.0.0.1/x3d/plane.x3d";
+	var getUrl = "/x3d/xyz.x3d";
 	outLog.innerHTML = "<b>Loading </b>" + getUrl + "<br>";
 	doAjaxQuery("GET", getUrl);
 }
