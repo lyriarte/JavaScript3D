@@ -8,6 +8,7 @@
 function Object3D()
 {
 	this.color = null;
+	this.name = null;
 	
 	this.mesh = new Mesh(0,0,null,null);
 	this.position = new Matrix3D();
