@@ -128,12 +128,13 @@ Object3D.prototype.update = function(focal, screenX, screenY)
 	return nEdge + this.mesh.nEdge;
 };
 
-Object3D.prototype.paint = function(gc) 
+Object3D.prototype.paint = function(gc, parentColor) 
 {
+	var paintColor = this.color ? this.color : parentColor;
 	var i;
 	for (i = 0; i < this.nChild; i++) {
-		this.child[i].paint(gc);
+		this.child[i].paint(gc, paintColor);
 	}
-	this.mesh.drawWireframe(gc,this.color);
+	this.mesh.drawWireframe(gc, paintColor);
 };
 
