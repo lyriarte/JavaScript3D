@@ -110,12 +110,6 @@ Object3D.prototype.addChild = function(obj)
 	return this;
 };
 
-Object3D.prototype.getChild = function(i) {
-	if (this.nChild == 0)
-		return null;
-	return this.child[i];
-};
-
 Object3D.prototype.update = function(focal, screenX, screenY) 
 {
 	var i, nEdge;
