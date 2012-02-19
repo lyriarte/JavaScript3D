@@ -17,9 +17,10 @@ x3d.prototype.defKey = function(aNode) {
 	for (var iatt=0; iatt < aNode.attributes.length; iatt++) {
 		if (aNode.attributes.item(iatt).name == "DEF") {
 			this.defNodes[aNode.attributes.item(iatt).value] = aNode;
-			break;
+			return aNode.attributes.item(iatt).value;
 		}
 	}
+	return null;
 }
 
 x3d.prototype.useKey = function(aNode) {
@@ -32,7 +33,7 @@ x3d.prototype.useKey = function(aNode) {
 }
 
 x3d.prototype.getObject3D = function(aTransformGroup) {
-	this.defKey(aTransformGroup);
+	var objName = this.defKey(aTransformGroup);
 	aTransformGroup = this.useKey(aTransformGroup);
 	var obj = null;
 	var child = aTransformGroup.firstChild;
@@ -67,6 +68,8 @@ x3d.prototype.getObject3D = function(aTransformGroup) {
 	}
 	if (scale)
 		obj.transformMeshes(scale);
+	if (objName)
+		obj.name = objName;
 	return obj;
 }
 
@@ -99,7 +102,7 @@ x3d.prototype.getColor = function(aAppearance) {
 
 
 x3d.prototype.getShape = function(aShape) {
-	this.defKey(aShape);
+	var objName = this.defKey(aShape);
 	aShape = this.useKey(aShape);
 	var obj = null;
 	var color = null;
@@ -126,6 +129,8 @@ x3d.prototype.getShape = function(aShape) {
 		obj = new Object3D();
 	if (color)
 		obj.color = color;
+	if (objName)
+		obj.name = objName;
 	return obj;
 }
 
@@ -225,5 +230,27 @@ x3d.prototype.getScene = function(xmlDoc) {
 	this.scene = this.getObject3D(jScene);
 	return this.scene;
 }
-	
- 
+
+
+x3d.prototype.findObjectChildByName = function(defName, rootObj) {
+	var obj = null;
+	if (rootObj.name && rootObj.name == defName)
+		return rootObj;
+	for (var i=0; i<rootObj.nChild; i++) {
+		obj = this.findObjectChildByName(defName, rootObj.child[i]);
+		if (obj)
+			return obj;
+	}
+	return null;
+}
+
+
+x3d.prototype.findObjectByPath = function(defPath) {
+	var obj = this.scene;
+	for (var i=0; i<defPath.length; i++) {
+		obj = this.findObjectChildByName(defPath[i],obj);
+		if (!obj)
+			return null;
+	}
+	return obj;
+}
