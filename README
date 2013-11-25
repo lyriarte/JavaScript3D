@@ -3,4 +3,6 @@
 Mini 3D JavaScript engine on HTML5 canvas
 
   * License: BSD <http://www.opensource.org/licenses/bsd-license.php>
+  * Live demo: <http://lyriarte.free.fr/mini3D.html>
+  * X3D interpreter version: <https://github.com/lyriarte/gllimpx/wiki>
 
